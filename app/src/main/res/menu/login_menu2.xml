@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--
+        <item android:id="@+id/last_version"
+            android:title="@string/last_version"
+            app:showAsAction="never"/>
+-->
+        <item
+            android:id="@+id/middleware"
+            android:title="@string/middlewareOn"
+            app:showAsAction="never"/>
+        <item android:id="@+id/exit"
+            android:title="@string/exit" />
+    </menu>

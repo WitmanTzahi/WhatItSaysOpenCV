@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:layout_gravity="right"
+	android:gravity="right" android:fitsSystemWindows="true">
+<!--
+	<RelativeLayout
+    	android:id="@+id/layout_sidebar"
+        android:layout_width="match_parent" android:layout_height="50dip"
+        android:orientation="vertical" android:background="#0046A5">
+	    <TextView android:id="@+id/welcome_message" android:license="@string/login_welcome"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="22sp" android:layout_centerInParent="true" android:textColor="@android:color/white"
+			android:textStyle="bold" >
+		</TextView>
+	</RelativeLayout>
+-->
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="30dp" android:paddingBottom="10dp"
+		android:paddingRight="20dp" android:paddingLeft="20dp" android:layout_gravity="right" android:gravity="right">
+		<EditText android:id="@+id/name" android:layout_width="160sp"
+			android:layout_height="wrap_content"
+			android:singleLine="true" android:padding="5dp" android:maxLength="9" android:layout_marginRight="35dp"
+			android:inputType="phone" android:textSize="28sp" android:digits="0123456789" 
+			android:layout_gravity="center" android:gravity="center" android:selectAllOnFocus="true">
+			<requestFocus></requestFocus>
+		</EditText>
+		<TextView android:id="@+id/name_message" android:text="@string/login_name"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="20sp" android:layout_gravity="right|center_vertical"
+			android:gravity="right|center_vertical" android:paddingTop="5dp" android:textStyle="bold">
+		</TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:paddingTop="10dp" android:paddingBottom="10dp"
+		android:paddingRight="20dp" android:paddingLeft="20dp" android:layout_gravity="right" android:gravity="right">
+
+		<EditText android:id="@+id/password" android:layout_width="160sp"
+			android:layout_height="wrap_content"
+			android:singleLine="true" android:padding="5dp" android:maxLength="6"
+			android:inputType="numberPassword" android:textSize="28sp"
+			android:layout_marginRight="48dp" android:layout_gravity="center"
+			android:gravity="center" android:digits="0123456789" android:selectAllOnFocus="true">
+		</EditText>
+
+		<TextView android:id="@+id/password_message" android:text="@string/login_password"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="20sp" android:layout_gravity="right|center_vertical"
+			android:gravity="right|center_vertical" android:paddingTop="5dp" android:textStyle="bold">
+		</TextView>
+	</LinearLayout>
+	<LinearLayout android:id="@+id/layout_authority"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="horizontal" android:paddingTop="10dp" android:paddingBottom="10dp"
+		android:paddingRight="20dp" android:paddingLeft="20dp"
+		android:layout_gravity="right" android:gravity="right"
+		android:visibility="gone">
+		<EditText android:id="@+id/authority" android:layout_width="160sp"
+			android:layout_height="wrap_content" 
+			android:singleLine="true" android:padding="5dp" android:maxLength="9"
+			android:textSize="28sp" android:inputType="phone" android:digits="0123456789" 
+			android:layout_marginRight="62dp" android:layout_gravity="center"
+			android:gravity="center" android:selectAllOnFocus="true">
+		</EditText>
+		<TextView android:id="@+id/authority_message" android:text="@string/login_authority"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="20sp" android:layout_gravity="right|center_vertical"
+			android:gravity="right|center_vertical" android:paddingTop="5dp" android:textStyle="bold">
+		</TextView>
+	</LinearLayout>
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:gravity="center"
+		android:paddingTop="20dp" android:paddingBottom="5dp">
+		<Button android:id="@+id/dologin" 
+			android:layout_width="120dp" android:text="@string/login_command"
+			style="@style/ButtonBlue" >
+		</Button>
+	</LinearLayout>
+	<LinearLayout android:layout_width="fill_parent" android:layout_marginTop="20dp"
+		android:layout_height="wrap_content" android:orientation="vertical"
+		android:paddingBottom="5dp" android:layout_gravity="right"
+		android:gravity="right">
+		<TextView android:id="@+id/welcome_version"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:textSize="15sp" android:layout_gravity="center|center_vertical"
+			android:gravity="center|center_vertical">
+		</TextView>
+		<TextView android:id="@+id/tickets"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="15sp" android:layout_gravity="right"
+			android:layout_marginRight="20dp"
+			android:gravity="center|center_vertical">
+		</TextView>
+		<TextView android:id="@+id/pictures"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:textSize="15sp" android:layout_gravity="right"
+			android:layout_marginRight="20dp"
+			android:gravity="center|center_vertical">
+		</TextView>
+	</LinearLayout>	
+</LinearLayout>			

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "705971082245",
+    "firebase_url": "https://whatitsays-ce696.firebaseio.com",
+    "project_id": "whatitsays-ce696",
+    "storage_bucket": "whatitsays-ce696.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705971082245:android:1dbc72083d9528bd",
+        "android_client_info": {
+          "package_name": "com.lbmotion.whatitsays"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "705971082245-at3bp4vtc62qvv5apm0g8ljp09sdh64a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lbmotion.whatitsays",
+            "certificate_hash": "5d60a854955334fc55522a603276cf732bbb1222"
+          }
+        },
+        {
+          "client_id": "705971082245-3ua1sel8iq52ujifcjlu09ipmhudaqpj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0rD-2KGLcNUNqv54yxtMwzE-2r4xHuPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "705971082245-3ua1sel8iq52ujifcjlu09ipmhudaqpj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

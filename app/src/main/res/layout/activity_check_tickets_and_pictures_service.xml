@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:fitsSystemWindows="true"
+	android:background="@android:color/black">
+	<TextView android:layout_centerInParent="true"
+		android:id="@+id/check_picture_text"
+		android:layout_width="wrap_content"
+		android:textColor="#FFFFFF"
+		android:textSize="26sp"
+		android:textStyle="bold"
+		android:text="@string/check_picture_text"
+		android:layout_height="wrap_content" />
+	<LinearLayout android:orientation="vertical" android:gravity="right|center_vertical"
+		android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:layout_below="@+id/check_picture_text" android:layout_margin="30dp">
+<!--
+		<Button android:id="@+id/stop_running" android:gravity="right|center_vertical" android:layout_gravity="right|center_vertical"
+			android:layout_width="wrap_content"
+			android:license="@string/stop_running" style="@style/ButtonBlue" />
+-->
+		<Button android:id="@+id/close_sreen" android:gravity="right|center_vertical" android:layout_gravity="right|center_vertical"
+			android:layout_width="wrap_content" android:layout_marginTop="20dp"
+			android:text="@string/close_sreen" style="@style/ButtonBlue" />
+	</LinearLayout>
+</RelativeLayout>
