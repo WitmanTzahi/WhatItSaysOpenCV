@@ -250,16 +250,16 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
                     rects.push_back(mr);
                 }
             }
-            str = "12";
-            __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^        str = "12";
+//^^        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
         }
     }
     catch (...) {
-        str = "12.1";
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^    str = "12.1";
+//^^    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     }
-    str = "13";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "13";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     if (contours.size() < 7) { //^^^^5
         results[0] = 0;
         results[1] = 0;
@@ -267,8 +267,8 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
         results[3] = 0;
         return results;
     }
-    str = "14";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "14";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
 //  vector<vector<Point> >::iterator itc = contours.begin();
 //  while (itc != contours.end()) {
 //  ++itc;
@@ -277,8 +277,8 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
     vector< Rect > good_rects;
     int counter = 0;
     for (size_t i = 0; i < contours.size(); ++i) {
-        str = "15";
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^    str = "15";
+//^^    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
         //Create bounding rect of object
         Rect mr = boundingRect(contours.at(i));
         if(mr.x + mr.width >= img_threshold_result.cols) {
@@ -299,11 +299,11 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
         else if (verifyResult == 1) {
             counter++;
         }
-        str = "16";
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^    str = "16";
+//^^    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     }
-    str = "17";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "17";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     int halfRotation = 0;
     bool reduceCounter = false;
     if (good_rects.size() > 6) {
@@ -338,8 +338,8 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
                 counter--;
             }
         }
-        str = "18";
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^    str = "18";
+//^^    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
         diff = 10;
         while (diff >= 5 && good_rects.size() > 6) {
             int lowerPoints = 0;
@@ -381,8 +381,8 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
                 }
             }
         }
-        str = "19";
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^    str = "19";
+//^^    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
         if (good_rects.size() >= 7) {
             if (good_rects.at(0).x < 8) {
                 int aveY = 0;
@@ -424,8 +424,8 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
             }
         }
     }
-    str = "20";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "20";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     if (good_rects.size() > 5 && doOutput) {
         int maxY = 0;
         int minY = 0;
@@ -452,13 +452,13 @@ int* PlateProcessing::characterSegmentation(int img_threshold_value,bool checkCo
             }
         }
     }
-    str = "21";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "21";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     results[0] = good_rects.size();
     results[1] = counter;
     results[2] = halfRotation;
     results[3] = fixes;
-    str = "22";
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
+//^^str = "22";
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "PlateProcessing::characterSegmentation:%s", str.c_str());
     return results;
 }

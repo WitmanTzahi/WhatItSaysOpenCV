@@ -19,7 +19,7 @@
             android:id="@+id/camera" />
         <TextView android:id="@+id/operation_mode" android:layout_marginLeft="10dp"
             android:textSize="24dp" android:textStyle="bold"
-            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textAppearance="?attr/textAppearanceListItem"
             android:textColor="@android:color/white" android:layout_alignParentBottom="true"
             android:layout_width="wrap_content" android:layout_alignParentLeft="true"
             android:layout_height="wrap_content" />
@@ -40,10 +40,17 @@
                 android:layout_height="79dp" />
             <TextView android:id="@+id/big_text"
                 android:textSize="28dp" android:textStyle="bold" android:layout_marginTop="10dp"
-                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textAppearance="?attr/textAppearanceListItem"
                 android:textColor="@android:color/white"
                 android:layout_width="wrap_content" android:layout_gravity="center_horizontal" android:gravity="center_horizontal"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+        <RelativeLayout android:id="@+id/next_car" android:layout_margin="100dp" android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView android:src="@drawable/archer" android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

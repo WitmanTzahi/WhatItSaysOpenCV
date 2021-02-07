@@ -5,22 +5,10 @@ package com.lbmotion.whatitsays.util;
  */
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.view.View;
-import android.widget.TextView;
-
-import com.lbmotion.whatitsays.MainActivity;
-import com.lbmotion.whatitsays.R;
-import com.lbmotion.whatitsays.UCApp;
 import com.lbmotion.whatitsays.common.BaseActivity;
 import com.lbmotion.whatitsays.data.DB;
-import com.lbmotion.whatitsays.data.ExistingWarning;
 import com.lbmotion.whatitsays.data.List2s;
 import com.lbmotion.whatitsays.data.List3;
-import com.lbmotion.whatitsays.data.Violation;
 
 import java.util.Vector;
 

@@ -121,11 +121,11 @@ Java_com_lbmotion_whatitsays_MainActivity_InitPlates(JNIEnv *env, jobject) {
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_lbmotion_whatitsays_MainActivity_GetPlates(JNIEnv *env, jobject, jlong addrRgba, jlong plate, jlong digit1, jlong digit2, jlong digit3, jlong digit4, jlong digit5, jlong digit6, jlong digit7, jlong digit8, jlong digit9, jlong digit10) {
 //Java_com_lbmotion_whatitsays_MainActivity_GetPlates(JNIEnv *env, jobject, jlong addrRgba, jlong digit1, jlong digit2, jlong digit3, jlong digit4, jlong digit5, jlong digit6, jlong digit7, jlong digit8, jlong digit9, jlong digit10) {
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "GetPlates");
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "GetPlates");
     Mat& mRgb = *(Mat*)addrRgba;
 //
-    string str = to_string(mRgb.rows) + "X" + to_string(mRgb.cols);
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "Size:%s", str.c_str());
+//^^string str = to_string(mRgb.rows) + "X" + to_string(mRgb.cols);
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "Size:%s", str.c_str());
     Mat grayResultBest1, grayResultBest2;
     int* results = process(mRgb, grayResultBest1, 1);
     int result_best_img_threshold1 = results[0];
@@ -133,8 +133,8 @@ Java_com_lbmotion_whatitsays_MainActivity_GetPlates(JNIEnv *env, jobject, jlong 
     bool result_best_clearLine1 = results[2];
     int best_number_of_rects1 = results[4];
     int halfRotation = results[3];
-    str = to_string(result_best_checkCounters1) + " " + to_string(result_best_clearLine1) + " " + to_string(best_number_of_rects1) + " " + to_string(halfRotation);
-    __android_log_print(ANDROID_LOG_ERROR, TAG, "%s", str.c_str());
+//^^str = to_string(result_best_checkCounters1) + " " + to_string(result_best_clearLine1) + " " + to_string(best_number_of_rects1) + " " + to_string(halfRotation);
+//^^__android_log_print(ANDROID_LOG_ERROR, TAG, "%s", str.c_str());
     PlateProcessing plateProcessing;
     bool hasDigits = false;
     if (halfRotation == 2 || best_number_of_rects1 < 8) {

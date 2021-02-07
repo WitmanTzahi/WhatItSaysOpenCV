@@ -7,8 +7,7 @@ import com.lbmotion.whatitsays.util.Util;
 import java.util.UUID;
 
 public class LisenceNumber extends Base {
-	private static final String TAG = "LisenceNumber";
-	private static LisenceNumber 		me = null;
+	private static final String 		TAG = "LisenceNumber";
 	public 	CheckLincense 				checkLincense = null;
 	private String carInformationId;
 	private int							violationListCode;
@@ -27,8 +26,8 @@ public class LisenceNumber extends Base {
 	}
 
 	public static LisenceNumber doCheck(String CarInformationId, String secondQuery) {
-		for(int i = 0;i < 6;i++) {
-			me = new LisenceNumber(CarInformationId,UCApp.violation,(byte)UCApp.location,UCApp.streetCode,UCApp.streetNumber,secondQuery);
+//		for(int i = 0;i < 6;i++) {
+			LisenceNumber me = new LisenceNumber(CarInformationId,UCApp.violation,(byte)UCApp.location,UCApp.streetCode,UCApp.streetNumber,secondQuery);
 			me.start();
 			communicationThreads.addElement(me);
 			try {
@@ -36,22 +35,22 @@ public class LisenceNumber extends Base {
 					try {Thread.sleep(250);} catch (InterruptedException ie) {}
 				}
 				try{communicationThreads.removeElement(me);}catch (Exception e) {}
-				if (me.errorOccurred && !me.didAbort) {
-					try {Thread.sleep(250);} catch (InterruptedException ie) {}
-				}
-				else {
-					break;
-				}
+//				if (me.errorOccurred && !me.didAbort) {
+//					try {Thread.sleep(250);} catch (InterruptedException ie) {}
+//				}
+//				else {
+//					break;
+//				}
 			}
 			catch (Exception e) {}
 			catch (Error e) {}
-		}
+//		}
 		return me;
 	}
 
 	public static LisenceNumber doCheck(String CarInformationId, int violationListCode, byte streetByAcrossIn, int streetCode, String streetNumber, String secondQuery) {
-		for(int i = 0;i < 6;i++) {
-			me = new LisenceNumber(CarInformationId,violationListCode,streetByAcrossIn,streetCode,streetNumber,secondQuery);
+//		for(int i = 0;i < 6;i++) {
+		LisenceNumber me = new LisenceNumber(CarInformationId,violationListCode,streetByAcrossIn,streetCode,streetNumber,secondQuery);
 			me.start();
 			communicationThreads.addElement(me);
 			try {
@@ -60,27 +59,27 @@ public class LisenceNumber extends Base {
                         Thread.sleep(250);} catch (InterruptedException ie) {}
 				}
 				try{communicationThreads.removeElement(me);}catch (Exception e) {}
-				if (me.errorOccurred && !me.didAbort) {
-					try {
-                        Thread.sleep(250);} catch (InterruptedException ie) {}
-				}
-				else {
-					break;
-				}
+//				if (me.errorOccurred && !me.didAbort) {
+//					try {
+//                        Thread.sleep(250);} catch (InterruptedException ie) {}
+//				}
+//				else {
+//					break;
+//				}
 			}
 			catch (Exception e) {}
 			catch (Error e) {}
-		}
+//		}
 		return me;
 	}
 
-	public static void abort() {
-		try {
-			if(me != null)
-				me.doAbort();
-		}
-		catch (Exception e) {}
-	}
+//	public static void abort() {
+//		try {
+//			if(me != null)
+//				me.doAbort();
+//		}
+//		catch (Exception e) {}
+//	}
 
 	public void run() {
 		try {

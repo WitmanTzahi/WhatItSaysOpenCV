@@ -1,11 +1,12 @@
 package com.lbmotion.whatitsays.service;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.lbmotion.whatitsays.R;
 import com.lbmotion.whatitsays.managers.SendTicketsAndPictures;
@@ -14,7 +15,7 @@ import com.lbmotion.whatitsays.managers.SendTicketsAndPictures;
  * Created by witman on 20/03/2018.
  */
 
-public class CancelTicketsAndPicturesService extends Activity {
+public class CancelTicketsAndPicturesService extends AppCompatActivity {
 
     private Button buttonStop,buttonClose;
     private TextView message;

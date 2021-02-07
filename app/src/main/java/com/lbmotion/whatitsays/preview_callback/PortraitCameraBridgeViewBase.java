@@ -1,7 +1,6 @@
 package com.lbmotion.whatitsays.preview_callback;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
@@ -13,6 +12,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import org.opencv.R;
 import org.opencv.android.FpsMeter;

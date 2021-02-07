@@ -1,6 +1,5 @@
 package com.lbmotion.whatitsays.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -13,6 +12,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.view.TouchDelegate;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.lbmotion.whatitsays.data.DB;
 import com.lbmotion.whatitsays.data.TicketInformation;
@@ -252,7 +253,7 @@ public class Util {
 		return bitmap;
 	}
 
-	public static Bitmap getBitmap(Activity activity, Uri image, int reduction, String cameraWorkingPath) throws Exception {
+	public static Bitmap getBitmap(AppCompatActivity activity, Uri image, int reduction, String cameraWorkingPath) throws Exception {
 		Bitmap bitmap = null;
 		System.gc();
 		InputStream in = activity.getContentResolver().openInputStream(image);
@@ -414,7 +415,7 @@ public class Util {
 		return o;
 	}
 
-	public static boolean isInDebugMode(Activity activity) {
+	public static boolean isInDebugMode(AppCompatActivity activity) {
 		boolean debuggable = false;
         PackageManager pm = activity.getPackageManager();
         try {

@@ -1,9 +1,10 @@
 package com.lbmotion.whatitsays.model;
 
-import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.os.SystemClock;
 import android.os.Trace;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.lbmotion.whatitsays.env.Logger;
 
@@ -51,7 +52,7 @@ public class ClassifierLite {
         imgData.order(ByteOrder.nativeOrder());
     }
 
-    public void create(Activity activity, Device device, int numThreads) throws IOException {
+    public void create(AppCompatActivity activity, Device device, int numThreads) throws IOException {
         tfliteModel = loadModelFile(activity);
         switch (device) {
             case NNAPI:
@@ -69,7 +70,7 @@ public class ClassifierLite {
         LOGGER.d("Created a Tensorflow Lite Image ClassifierLite.");
     }
 
-    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
+    private MappedByteBuffer loadModelFile(AppCompatActivity activity) throws IOException {
         AssetFileDescriptor fileDescriptor = activity.getAssets().openFd("license_plate.tflite");
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();

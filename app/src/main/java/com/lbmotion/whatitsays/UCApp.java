@@ -73,6 +73,9 @@ public class UCApp extends Application {
     public static short                     location;
     public static int                       Lk, violation, user, streetCode, timeout;
     public static boolean                   breakMode = false;
+    public static boolean                   motorcycleToo = true;
+    public static boolean                   highAccuracy = false;
+    public static int                       countVerification = 2;
 
     @Override
     public void onCreate() {

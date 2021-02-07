@@ -1,7 +1,6 @@
 package com.lbmotion.whatitsays;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +61,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -90,35 +90,37 @@ import static org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR;
 
 //https://www.programcreek.com/java-api-examples/?class=org.opencv.core.Mat&method=channels
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2, LicenseQueryCompleted {
-    public static final String TAG = "MainActivity";
+    public static final String      TAG = "MainActivity";
 
-    public final static String LICENSE_PLATE = "LICENSE_PLATE";
-    public final static String DIRECTORY_LICENSE_PLATE = "DIRECTORY_LICENSE_PLATE";
+    public final static String      LICENSE_PLATE = "LICENSE_PLATE";
+    public final static String      DIRECTORY_LICENSE_PLATE = "DIRECTORY_LICENSE_PLATE";
 
-    private static final int   DIM_BATCH_SIZE = 1;
-    private static final int   DIM_PIXEL_SIZE = 3;
-    private static final int   DIM_IMG_SIZE_X = 224;
-    private static final int   DIM_IMG_SIZE_Y = 224;
-    private final int[]        intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
-    private List<ClassifierPB> mClassifiers = new ArrayList<>();
-    private long lastProcessTime = (new Date()).getTime();
+    private static final int        DIM_BATCH_SIZE = 1;
+    private static final int        DIM_PIXEL_SIZE = 3;
+    private static final int        DIM_IMG_SIZE_X = 224;
+    private static final int        DIM_IMG_SIZE_Y = 224;
+    private final int[]             intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
+    private List<ClassifierPB>      mClassifiers = new ArrayList<>();
+    private long                    lastProcessTime = (new Date()).getTime();
 
-    static private AtomicBoolean working = new AtomicBoolean(false);
-    private CameraBridgeViewBase _cameraBridgeViewBase;
+    static private AtomicBoolean    working = new AtomicBoolean(false);
+    private CameraBridgeViewBase    _cameraBridgeViewBase;
 //  private PortraitCameraBridgeViewBase _cameraBridgeViewBase;
 
-    private Handler handler;
-    private HandlerThread handlerThread;
+    private Handler                 handler;
+    private HandlerThread           handlerThread;
 
-    private int scrollListHeight;
+    private int                     scrollListHeight;
 
-    private boolean      testing = false;
-    private ImageView    bigImageView;
-    private TextView     bigTextView;
-    private LinearLayout licenseArea;
-    private Vector<ShowLicense> showLicenses = new Vector<ShowLicense>();
+    private boolean                 testing = false;
+    private ImageView               bigImageView;
+    private TextView                bigTextView;
+    private LinearLayout            licenseArea;
+    private RelativeLayout          nextCarLayout;
 
-    private Vector<String> inputFiles = new Vector<String>();
+    private Vector<ShowLicense>     showLicenses = new Vector<ShowLicense>();
+
+    private Vector<String>          inputFiles = new Vector<String>();
 
     static {
         System.loadLibrary("native-lib");
@@ -128,23 +130,23 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //  private List<List<FirebaseVisionText.TextBlock>> blocks = new Vector<>();
 
     // These variables are used (at the moment) to fix camera orientation from 270degree to 0degree
-    Mat mRgba;
+    private Mat                     mRgba;
 
     // A reference to the service used to get location updates.
-    private LocationUpdatesService mService = null;
+    private LocationUpdatesService  mService = null;
     // Tracks the bound state of the service.
-    private boolean mBound = false;
+    private boolean                 mBound = false;
 
-    private RecyclerView mPlatesRecyclerView;
-    private RecyclerView.Adapter mPlatesAdapter;
+    private RecyclerView            mPlatesRecyclerView;
+    private RecyclerView.Adapter    mPlatesAdapter;
     private RecyclerView.LayoutManager mPlatesLayoutManager;
-    private Vector<Plate> plates = new Vector<>();
-    private Vector<Plate> allPlates = new Vector<>();
-    private ParkingQuery parkingQuery = new ParkingQuery(this);
-    private Rect roi = null;
+    private Vector<Plate>           plates = new Vector<>();
+    private Vector<Plate>           allPlates = new Vector<>();
+    private ParkingQuery            parkingQuery = new ParkingQuery(this);
+    private Rect                    roi = null;
 
-    private Mat digits[] = {};
-    private Mat plateClassifaier = null;
+    private Mat                     digits[] = {};
+    private Mat                     plateClassifaier = null;
 
     public enum StatesTypes {
         START_NEW_DOCH,
@@ -154,11 +156,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         STEP_TO_COMPLETE_CAR_DOCH
     }
 
-    private String        topLicens_licensePlate = "";
-    private String        topLicens_directoryLicensePlate = "";
-    private int           topLicens_count = 0;
-    private AtomicBoolean topLicens_on = new AtomicBoolean(false);
-    private AtomicBoolean topLicens_send = new AtomicBoolean(true);
+    private String                  topLicens_licensePlate = "";
+    private String                  topLicens_directoryLicensePlate = "";
+    private int                     topLicens_count = 0;
+    private AtomicBoolean           topLicens_on = new AtomicBoolean(false);
+    private AtomicBoolean           topLicens_send = new AtomicBoolean(true);
 
     private static Vector<TicketInformation> ticketInformations = null;
 
@@ -175,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         }
         if(UCApp.breakMode && packachDecisionCode == 1) {
-            if (count > 2) {
+            if (count > UCApp.countVerification) {
                 topLicens_send.set(false);
                 if(count > topLicens_count)
                     gotoUrbanControl(licensePlate, directoryLicensePlate);
@@ -360,6 +362,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         mPlatesRecyclerView.setAdapter(null);
                         plates.removeAllElements();
                         plates.addAll(tempPlates);
+                        try {
+                            for (Plate plate : plates)
+                                if (plate.count <= UCApp.countVerification)
+                                    plates.remove(plate);
+                        }
+                        catch (Exception e) {}
                         mPlatesRecyclerView.setAdapter(mPlatesAdapter);
                     }
                     try {mPlatesAdapter.notifyDataSetChanged();} catch (Exception e) {} catch (Error e) {}
@@ -399,6 +407,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         );
         actionBarHeight = (int) styledAttributes.getDimension(0, 0);
         styledAttributes.recycle();
+
+        nextCarLayout = findViewById(R.id.next_car);
+        nextCarLayout.setVisibility(View.GONE);
 
         scrollListHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, getResources().getDisplayMetrics());
         int extra = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
@@ -491,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                ((Button)findViewById(R.id.test_mode)).setVisibility(View.GONE);
                 if(testing)
                     ((Button)findViewById(R.id.test_mode)).setText(R.string.live);
                 else
@@ -511,6 +523,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         UCApp.user = savedInstanceState.getInt("user");
         UCApp.location = savedInstanceState.getShort("location");
         UCApp.breakMode = savedInstanceState.getBoolean("breakMode");
+        UCApp.motorcycleToo = savedInstanceState.getBoolean("motorcycleToo");
         testing = savedInstanceState.getBoolean("testing");
         ParkingQuery.endTime = savedInstanceState.getLong("endTime");
         ParkingQuery.licensePlates = (HashMap<String,String>) savedInstanceState.getSerializable("licensePlates");
@@ -529,6 +542,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         savedInstanceState.putInt("user", UCApp.user);
         savedInstanceState.putShort("location", UCApp.location);
         savedInstanceState.putBoolean("breakMode", UCApp.breakMode);
+        savedInstanceState.putBoolean("motorcycleToo", UCApp.motorcycleToo);
         savedInstanceState.putBoolean("testing", testing);
         savedInstanceState.putLong("endTime", ParkingQuery.endTime);
         savedInstanceState.putSerializable("licensePlates", ParkingQuery.licensePlates);
@@ -549,7 +563,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.user = 10;
             UCApp.streetNumber = "1";
             UCApp.breakMode = false;
+            UCApp.motorcycleToo = true;
+            UCApp.highAccuracy = false;
             UCApp.timeout = 20;
+            UCApp.countVerification = 2;
         }
         else {
             UCApp.version = extraBundle.getString("Version");
@@ -562,6 +579,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.streetNumber = extraBundle.getString("StreetNumber");
             UCApp.breakMode = extraBundle.getBoolean("BreakMode");
             UCApp.timeout = extraBundle.getInt("timeout");
+            try {UCApp.motorcycleToo = extraBundle.getBoolean("SupportMotorcycle",true);} catch (Exception e) {}
+            try {UCApp.highAccuracy = extraBundle.getBoolean("HighAccuracy",false);} catch (Exception e) {}
+            try {UCApp.countVerification = extraBundle.getInt("CountVerification",2);} catch (Exception e) {}
         }
         saveConfigFile();
         plates = new Vector<>();
@@ -599,31 +619,24 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public void onPause() {
-        Log.e(TAG, "onPause 1");
         handlerThread.quitSafely();
         try {
             handlerThread.join();
             handlerThread = null;
             handler = null;
         } catch (InterruptedException e) {
-            Log.e(TAG, "onPause 2:"+e.getMessage());
         } catch (Exception e) {
-            Log.e(TAG, "onPause 3:"+e.getMessage());
         }
         try {
             super.onPause();
             disableCamera();
         } catch (Exception e) {
-            Log.e(TAG, "onPause 4:"+e.getMessage());
         } catch (Error e) {
-            Log.e(TAG, "onPause 5:"+e.getMessage());
         }
-        Log.e(TAG, "onPause 6");
     }
 
     @Override
     public void onBackPressed() {
-        Log.i(TAG, "doWorking 1 false");
         deleteRemovedLicenses();
         disableCamera();
         ParkingQuery.endTime = 0;
@@ -845,8 +858,12 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         new OnSuccessListener<FirebaseVisionText>() {
                             @Override
                             public void onSuccess(FirebaseVisionText texts) {
-                                processTextRecognitionResult(picture, texts, rgba);
-                                picture.recycle();
+                                try {
+                                    processTextRecognitionResult(picture, texts, rgba);
+                                    picture.recycle();
+                                }
+                                catch (Exception e) {}
+                                catch (Error e) {}
                                 System.gc();
                                 working.set(false);
                             }
@@ -870,8 +887,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 //            blocks.add(block);
 //        }
         String selectLicensePlate = "";
+        boolean licensePlateMotorcycleFlag = false;
         Rect selectedRect = new Rect();
-        int minNoneDigitCount = 999999;
         for (int i = 0; i < block.size(); i++) {
             List<FirebaseVisionText.Line> lines = block.get(i).getLines();
             for (int j = 0; j < lines.size(); j++) {
@@ -886,126 +903,155 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     if (rect.height > 0 && Math.abs(rect.width / (float) rect.height - 4.7272) < 4 && rect.height * 18 > rgba.rows()) {
                         String text = elements.get(k).getText();
                         String licensePlate = "";
-                        int noneDigitCount = 0;
                         for (int n = 0; n < text.length(); n++) {
                             if (Character.isDigit(text.charAt(n)))
                                 licensePlate += text.charAt(n);
-                            else
-                                noneDigitCount++;
                         }
                         licensePlate = licensePlate.replace("-", "");
                         licensePlate = licensePlate.replace(".", "");
                         licensePlate = licensePlate.replace(":", "");
-                        if (licensePlate.length() >= 7 && licensePlate.length() <= 8 && licensePlate.indexOf('/') == -1 && licensePlate.charAt(0) != '0' && noneDigitCount < minNoneDigitCount) {
+                        if (licensePlate.length() >= 7 && licensePlate.length() <= 8 && licensePlate.indexOf('/') == -1 && licensePlate.charAt(0) != '0') {
                             selectLicensePlate = licensePlate;
                             selectedRect = rect;
+                            licensePlateMotorcycleFlag = false;
+                        }
+                        if(UCApp.motorcycleToo && licensePlate.length() >= 5) {
+                            for (int jj = j + 1; jj <= j + 1 && jj < lines.size();jj++) {
+                                elements = lines.get(jj).getElements();
+                                for (int kk = 0; kk < elements.size(); kk++) {
+                                    RectF rectF_kk = new RectF(elements.get(kk).getBoundingBox());
+                                    Rect rect_kk = new Rect();
+                                    rect_kk.x = (int) rectF_kk.left;
+                                    rect_kk.y = (int) rectF_kk.top;
+//                                  rect_kk.height = (int) (rectF_kk.bottom - rectF_kk.top);
+//                                  rect_kk.width = (int) (rectF_kk.right - rectF_kk.left);
+                                    if(rect.contains(new Point(rect_kk.x, rect_kk.y))) {
+                                        text = elements.get(kk).getText();
+                                        String licensePlateMotorcycle = "";
+                                        for (int n = 0; n < text.length(); n++) {
+                                            if (Character.isDigit(text.charAt(n)))
+                                                licensePlateMotorcycle += text.charAt(n);
+                                        }
+                                        licensePlateMotorcycle = licensePlateMotorcycle.replace("-", "");
+                                        licensePlateMotorcycle = licensePlateMotorcycle.replace(".", "");
+                                        licensePlateMotorcycle = licensePlateMotorcycle.replace(":", "");
+                                        if ((licensePlateMotorcycle.length() == 2 || licensePlateMotorcycle.length() == 3) && licensePlate.indexOf('/') == -1) {
+                                            selectLicensePlate = licensePlate+licensePlateMotorcycle;
+                                            licensePlateMotorcycleFlag = true;
+                                            selectedRect = rect;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        if(selectLicensePlate.length() > 0) {
-            if (selectLicensePlate.length() >= 7 && selectLicensePlate.length() <= 8 && selectLicensePlate.charAt(0) != '0') {
-//              if (mService != null && mService.getLocation() != null && !matchAllButOne(selectLicensePlate)) {
-                if (mService != null) {
-                    Log.i(TAG, selectLicensePlate);
-                    Rect licenseRect = new Rect(selectedRect.x,selectedRect.y,selectedRect.width,selectedRect.height);
-                    if(roi == null)
-                        roi = new Rect(rgba.cols() * 36 / 100, (int)(rgba.rows() * 45 / 100), rgba.cols() * 28 / 100, rgba.rows() * 10 / 100);
-                    selectedRect.x = (selectedRect.x+selectedRect.width/2)-roi.width/2;
-                    selectedRect.y = (selectedRect.y+selectedRect.height/2)-roi.height/2;
-                    selectedRect.x = Math.max(selectedRect.x,0);
-                    selectedRect.y = Math.max(selectedRect.y,0);
-                    selectedRect.width = roi.width;
-                    selectedRect.height = roi.height;
-                    if(selectedRect.x+selectedRect.width > rgba.cols())
-                        selectedRect.width = rgba.cols()-selectedRect.x-1;
-                    if(selectedRect.y+selectedRect.height > rgba.rows())
-                        selectedRect.height = rgba.rows()-selectedRect.y-1;
-                    String licensePlateSecond = "";
+        if (selectLicensePlate.length() >= 7 && selectLicensePlate.length() <= 8 && selectLicensePlate.charAt(0) != '0') {
+//          if (mService != null && mService.getLocation() != null && !matchAllButOne(selectLicensePlate)) {
+            if (mService != null) {
+                Log.i(TAG, selectLicensePlate);
+                Rect licenseRect = new Rect(selectedRect.x,selectedRect.y,selectedRect.width,selectedRect.height);
+                if(roi == null)
+                    roi = new Rect(rgba.cols() * 36 / 100, (int)(rgba.rows() * 45 / 100), rgba.cols() * 28 / 100, rgba.rows() * 10 / 100);
+                selectedRect.x = (selectedRect.x+selectedRect.width/2)-roi.width/2;
+                selectedRect.y = (selectedRect.y+selectedRect.height/2)-roi.height/2;
+                selectedRect.x = Math.max(selectedRect.x,0);
+                selectedRect.y = Math.max(selectedRect.y,0);
+                selectedRect.width = roi.width;
+                selectedRect.height = roi.height;
+                if(selectedRect.x+selectedRect.width > rgba.cols())
+                    selectedRect.width = rgba.cols()-selectedRect.x-1;
+                if(selectedRect.y+selectedRect.height > rgba.rows())
+                    selectedRect.height = rgba.rows()-selectedRect.y-1;
+                String licensePlateSecond = "";
+                boolean changePlate = false;
+                if(!licensePlateMotorcycleFlag && UCApp.highAccuracy) {
                     try {
                         licensePlateSecond = doClassifiers(new Mat(rgba, licenseRect/*selectedRect*/));
-                    }
-                    catch (Exception e) {}
-                    catch (Error e) {}
-                    boolean changePlate = false;
+                    } catch (Exception e) {
+                    } catch (Error e) {}
                     if (licensePlateSecond.length() > 6) {
                         selectLicensePlate = licensePlateSecond;
                         changePlate = true;
                     }
-                    if (isPlatesContains(selectLicensePlate)) {
-                        synchronized (ticketInformations) {
-                            for(TicketInformation ticketInformation : ticketInformations) {
-                                if (ticketInformation.pictures.size() < 5 && ticketInformation.CarInformationId.equals(selectLicensePlate)) {
-                                    String filename = writeFileCar(rgba, selectLicensePlate, selectedRect, ticketInformation.pictures.size());
-                                    if (filename.length() > 0) {
-                                        ticketInformation.pictures.add(filename);
-                                        synchronized (allPlates) {
-                                            for (Plate plate : allPlates) {
-                                                if (plate.originalLicense.equals(selectLicensePlate)) {
-                                                    plate.count = ticketInformation.pictures.size();
-                                                    if (!plate.accurate && changePlate) {
-                                                        plate.accurate = true;
-                                                        if( plate.image  != null) {
-                                                            plate.image.recycle();
-                                                            System.gc();
-                                                        }
-                                                        plate.image = Bitmap.createBitmap(plateClassifaier.cols(), plateClassifaier.rows(), Bitmap.Config.ARGB_8888);
-                                                        Utils.matToBitmap(plateClassifaier, plate.image);
-                                                        writeFileLicense(plate.image, selectLicensePlate, selectedRect);
+                }
+                if (isPlatesContains(selectLicensePlate)) {
+                    synchronized (ticketInformations) {
+                        for(TicketInformation ticketInformation : ticketInformations) {
+                            if (ticketInformation.pictures.size() < 5 && ticketInformation.CarInformationId.equals(selectLicensePlate)) {
+                                String filename = writeFileCar(rgba, selectLicensePlate, selectedRect, ticketInformation.pictures.size());
+                                if (filename.length() > 0) {
+                                    ticketInformation.pictures.add(filename);
+                                    synchronized (allPlates) {
+                                        for (Plate plate : allPlates) {
+                                            if (plate.originalLicense.equals(selectLicensePlate)) {
+                                                plate.count = ticketInformation.pictures.size();
+                                                if (!plate.accurate && changePlate) {
+                                                    plate.accurate = true;
+                                                    if( plate.image  != null) {
+                                                        plate.image.recycle();
+                                                        System.gc();
                                                     }
-                                                    notifyExceptionPlates();
-                                                    break;
+                                                    plate.image = Bitmap.createBitmap(plateClassifaier.cols(), plateClassifaier.rows(), Bitmap.Config.ARGB_8888);
+                                                    Utils.matToBitmap(plateClassifaier, plate.image);
+                                                    writeFileLicense(plate.image, selectLicensePlate, selectedRect);
                                                 }
+                                                showNextCar(allPlates, plate);
+                                                notifyExceptionPlates();
+                                                break;
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    } else {
-                        TicketInformation ticketInformation = new TicketInformation();
-                        ticketInformation.carOrGM = false;
-                        ticketInformation.CarInformationId = selectLicensePlate;
-                        ticketInformation.timestamp = (new Date()).getTime();
-                        String filename = writeFileCar(rgba, selectLicensePlate, selectedRect , 0);
-                        if (filename.length() > 0) {
-                            Bitmap image;
-                            if(changePlate) {
-                                image = Bitmap.createBitmap(plateClassifaier.cols(), plateClassifaier.rows(), Bitmap.Config.ARGB_8888);
-                                Utils.matToBitmap(plateClassifaier, image);
+                    }
+                } else {
+                    TicketInformation ticketInformation = new TicketInformation();
+                    ticketInformation.carOrGM = false;
+                    ticketInformation.CarInformationId = selectLicensePlate;
+                    ticketInformation.timestamp = (new Date()).getTime();
+                    String filename = writeFileCar(rgba, selectLicensePlate, selectedRect , 0);
+                    if (filename.length() > 0) {
+                        Bitmap image;
+                        if(changePlate) {
+                            image = Bitmap.createBitmap(plateClassifaier.cols(), plateClassifaier.rows(), Bitmap.Config.ARGB_8888);
+                            Utils.matToBitmap(plateClassifaier, image);
+                        }
+                        else {
+                            if(picture.getWidth()/3 <= licenseRect.width) {
+                                image = Bitmap.createBitmap(picture, licenseRect.x, licenseRect.y, licenseRect.width, licenseRect.height);
                             }
                             else {
-                                if(picture.getWidth()/3 <= licenseRect.width) {
-                                    image = Bitmap.createBitmap(picture, licenseRect.x, licenseRect.y, licenseRect.width, licenseRect.height);
-                                }
-                                else {
-                                    int x = licenseRect.x + licenseRect.width / 8;
-                                    int w = licenseRect.width / 8 * 6 + 50;
-                                    if(picture.getWidth() < x + w)
-                                        w = picture.getWidth() - x - 1;
-                                    image = Bitmap.createBitmap(picture, x, licenseRect.y, w, licenseRect.height);
-                                }
+                                int x = licenseRect.x + licenseRect.width / 8;
+                                int w = licenseRect.width / 8 * 6 + 50;
+                                if(picture.getWidth() < x + w)
+                                    w = picture.getWidth() - x - 1;
+                                image = Bitmap.createBitmap(picture, x, licenseRect.y, w, licenseRect.height);
                             }
-                            ticketInformation.pictures.add(filename);
-                            synchronized (ticketInformations) {
-                                ticketInformations.add(ticketInformation);
-                            }
-                            Plate plate = new Plate();
-                            plate.originalLicense = plate.license = selectLicensePlate;
-                            plate.image = image;
-                            plate.count = ticketInformation.pictures.size();
-                            plate.index = allPlates.size();
-                            plate.accurate = changePlate;
-                            writeFileLicense(plate.image, selectLicensePlate, selectedRect);
-                            synchronized (allPlates) {
+                        }
+                        ticketInformation.pictures.add(filename);
+                        synchronized (ticketInformations) {
+                            ticketInformations.add(ticketInformation);
+                        }
+                        Plate plate = new Plate();
+                        plate.originalLicense = plate.license = selectLicensePlate;
+                        plate.image = image;
+                        plate.count = ticketInformation.pictures.size();
+                        plate.index = allPlates.size();
+                        plate.accurate = changePlate;
+                        writeFileLicense(plate.image, selectLicensePlate, selectedRect);
+                        synchronized (allPlates) {
 //                          if (allPlates.size() == 0)
-                                    allPlates.add(plate);
+                            allPlates.add(plate);
 //                              else
 //                                  allPlates.insertElementAt(plate, 0);
-                            }
-                            notifyExceptionPlates();
+                            showNextCar(allPlates, plate);
                         }
+                        notifyExceptionPlates();
                     }
                 }
             }
@@ -1179,13 +1225,16 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 synchronized (ParkingQuery.resultLicensePlates) {
                     if(ParkingQuery.resultLicensePlates.containsKey(plates.get(position).license)) {
                         int status = ParkingQuery.resultLicensePlates.get(plates.get(position).license).intValue();
-                        if(status == 0)
+                        if(status == 0) {
                             color = Color.GREEN;
+                        }
                         else if(status == 1) {
-                            if(count <= 2)
+                            if(count <= UCApp.countVerification) {
                                 color = Color.YELLOW;
-                            else
+                            }
+                            else {
                                 color = Color.RED;
+                            }
                         }
                     }
                 }
@@ -1206,6 +1255,40 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 size = plates.size();
             }
             return size;
+        }
+    }
+
+    private void showNextCar(Vector<Plate> plates, Plate plate) {
+        int count = 0;
+        for(Plate p : plates) {
+            if(plate.originalLicense.equals(p.originalLicense))
+                count += p.count;
+        }
+        if(count > UCApp.countVerification) {
+            (new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME)).startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD ,1000);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        nextCarLayout.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                    } catch (Error e) {
+                    }
+                }
+            });
+            new Thread() { public void run() {
+                try { Thread.sleep(750);} catch (InterruptedException ie) {}
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            nextCarLayout.setVisibility(View.GONE);
+                        } catch (Exception e) {
+                        } catch (Error e) {
+                        }
+                    }
+                });
+            }}.start();
         }
     }
 
@@ -1371,7 +1454,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             File file = getFileStreamPath("config");
             if(file.exists())
                 file.delete();
-            dataOutputStream = new DataOutputStream(new BufferedOutputStream(openFileOutput("config",Activity.MODE_PRIVATE)));
+            dataOutputStream = new DataOutputStream(new BufferedOutputStream(openFileOutput("config", AppCompatActivity.MODE_PRIVATE)));
             baos = new ByteArrayOutputStream();
             outputStream = new DataOutputStream(baos);
             outputStream.writeUTF(UCApp.streetNumber);
@@ -1383,6 +1466,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             outputStream.writeInt(UCApp.user);
             outputStream.writeShort(UCApp.location);
             outputStream.writeBoolean(UCApp.breakMode);
+            outputStream.writeBoolean(UCApp.motorcycleToo);
             byte[] b = baos.toByteArray();
             dataOutputStream.write(b, 0, b.length);
             dataOutputStream.flush();
@@ -1417,6 +1501,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.user = inputStream.readInt();
             UCApp.location = inputStream.readShort();
             UCApp.breakMode = inputStream.readBoolean();
+            UCApp.motorcycleToo = inputStream.readBoolean();
             Log.e(TAG,"readConfigFile 2");
         }
         catch (Exception e) {

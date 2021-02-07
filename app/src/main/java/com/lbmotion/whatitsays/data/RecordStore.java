@@ -1,8 +1,9 @@
 package com.lbmotion.whatitsays.data;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -37,7 +38,7 @@ public class RecordStore {
 		}
 		else {
 			if(createIfNecessary) {
-				me.setOutputStream(new DataOutputStream(new BufferedOutputStream(context.openFileOutput(recordStoreName, Activity.MODE_PRIVATE))));
+				me.setOutputStream(new DataOutputStream(new BufferedOutputStream(context.openFileOutput(recordStoreName, AppCompatActivity.MODE_PRIVATE))));
 				me.setInputStream(new DataInputStream(new BufferedInputStream(context.openFileInput(recordStoreName))));
 			}
 			else {

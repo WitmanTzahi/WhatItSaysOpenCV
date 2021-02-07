@@ -23,16 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //import org.apache.http.util.ByteArrayBuffer;
 
 abstract public class Base extends Thread {
-	private static String TAG = "Base";
+	private static String 			TAG = "Base";
 	public static boolean 			communicationViaMiddleware = true;
-	protected static Vector<Base> communicationThreads = new Vector<Base>();
-	public static String version = "1.1";
-	public static String webVersion = null;
-	protected AtomicBoolean isDone = new AtomicBoolean(false);
-	protected Timer helperTimer = null;
-	protected Socket socketConnection = null;
-	protected InputStream inputStream = null;
-	protected OutputStream outputStream = null;
+	protected static Vector<Base>   communicationThreads = new Vector<Base>();
+	public static String 			version = "1.1";
+	public static String 			webVersion = null;
+	protected AtomicBoolean 		isDone = new AtomicBoolean(false);
+	protected Timer 				helperTimer = null;
+	protected Socket 				socketConnection = null;
+	protected InputStream 			inputStream = null;
+	protected OutputStream 			outputStream = null;
 //
 	protected boolean 				openFailed = true;
 //		
@@ -44,7 +44,7 @@ abstract public class Base extends Thread {
 	public static short		 		lastPortWorking = 4800;
 	public static short 			lastPortBackground = 4801;
 
-	private static String IPAddressData = "212.179.107.21";
+	private static String 			IPAddressData = "212.179.107.21";
 //  private static String 			IPAddressData = "212.179.107.29";
 //	private static String 			IPAddressData = "62.90.108.241";
 //	private static String 			IPAddressData = "127.0.0.1";

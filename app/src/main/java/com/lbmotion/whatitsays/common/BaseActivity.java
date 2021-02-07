@@ -1,7 +1,5 @@
 package com.lbmotion.whatitsays.common;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,10 +9,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,9 +18,9 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.lbmotion.whatitsays.MainActivity;
@@ -37,26 +33,20 @@ import com.lbmotion.whatitsays.communication.GetAuthorityData;
 import com.lbmotion.whatitsays.communication.GetAuthorityDataHTTP;
 import com.lbmotion.whatitsays.communication.GetViolations;
 import com.lbmotion.whatitsays.data.DB;
-import com.lbmotion.whatitsays.data.List2s;
-import com.lbmotion.whatitsays.data.List3;
 import com.lbmotion.whatitsays.data.LoginData;
 import com.lbmotion.whatitsays.data.Parameters;
 import com.lbmotion.whatitsays.data.TicketInformation;
-import com.lbmotion.whatitsays.managers.SendTicketsAndPictures;
-//import com.lbmotion.whatitsays.util.LocationDetection;
 import com.lbmotion.whatitsays.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Date;
 import java.util.Vector;
 
 import static com.lbmotion.whatitsays.UCApp.ticketInformation;
+
+//import com.lbmotion.whatitsays.util.LocationDetection;
 
 public abstract class BaseActivity extends AppCompatActivity {
 //
@@ -107,7 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 		getSupportActionBar().setCustomView(v);
 	}
 
-	public static void showErrorMessageHandle(final int errorMessage, final Activity activity) {
+	public static void showErrorMessageHandle(final int errorMessage, final AppCompatActivity activity) {
 		showErrorMessageHandle(activity.getString(errorMessage),activity);
 	}
 
@@ -124,7 +114,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return "V"+installVersion;
     }
 
-	public static void showErrorMessageHandle(final String errorMessage, final Activity activity) {
+	public static void showErrorMessageHandle(final String errorMessage, final AppCompatActivity activity) {
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -824,7 +814,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 		return UCApp.citizenRemarksToViolation;
 	}
 
-	public static void showSoftKeyboard(final View view, final Activity activity) {
+	public static void showSoftKeyboard(final View view, final AppCompatActivity activity) {
         try {
             InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
@@ -1052,7 +1042,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 		}).execute();
 	}
 */
-    public static String getPath(Activity activity) {
+    public static String getPath(AppCompatActivity activity) {
         File dir = null;
         if(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
             File storageDir = android.os.Environment.getExternalStorageDirectory();

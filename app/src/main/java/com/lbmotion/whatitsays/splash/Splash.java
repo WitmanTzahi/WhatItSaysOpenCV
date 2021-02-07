@@ -1,15 +1,16 @@
 package com.lbmotion.whatitsays.splash;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.lbmotion.whatitsays.R;
 
 
-public class Splash extends Activity {
+public class Splash extends AppCompatActivity {
 	public static boolean _active;
 //	protected int _splashTime = 15000;
 //	AnimationSet rootSet;

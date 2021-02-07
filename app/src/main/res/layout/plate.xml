@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true" android:layout_marginLeft="4dp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textAppearance="?attr/textAppearanceListItemSmall"
         android:gravity="center_vertical" />
     <RelativeLayout android:id="@+id/image_layout"
         android:background="@drawable/customborder" android:padding="4dp"
