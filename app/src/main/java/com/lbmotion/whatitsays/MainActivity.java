@@ -100,10 +100,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private static final int        DIM_IMG_SIZE_X = 224;
     private static final int        DIM_IMG_SIZE_Y = 224;
     private final int[]             intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
+    private long                    lastToneGenerator = 0;
     private List<ClassifierPB>      mClassifiers = new ArrayList<>();
     private long                    lastProcessTime = (new Date()).getTime();
 
-    static private AtomicBoolean    working = new AtomicBoolean(false);
+    private static  AtomicBoolean   working = new AtomicBoolean(false);
     private CameraBridgeViewBase    _cameraBridgeViewBase;
 //  private PortraitCameraBridgeViewBase _cameraBridgeViewBase;
 
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             }
         }
         if(UCApp.breakMode && packachDecisionCode == 1) {
+            Log.i(TAG, "notifyQueryCompletion:"+count);
             if (count > UCApp.countVerification) {
                 topLicens_send.set(false);
                 if(count > topLicens_count)
@@ -188,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(UCApp.doNotQuery)
+                            plates = bestLicensePlatesDisplay();
                         try {mPlatesAdapter.notifyDataSetChanged();} catch (Exception e) {} catch (Error e) {}
                     }
                 });
@@ -206,6 +210,16 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     }
                 }
             }
+        }
+        else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(UCApp.doNotQuery)
+                        plates = bestLicensePlatesDisplay();
+                    try {mPlatesAdapter.notifyDataSetChanged();} catch (Exception e) {} catch (Error e) {}
+                }
+            });
         }
     }
 
@@ -255,21 +269,25 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         file.delete();
     }
 
+    private AtomicBoolean doExit = new AtomicBoolean(false);
     private void gotoUrbanControl(final String licensePlate, final String directoryLicensePlate) {
-        deleteRemovedLicenses();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ParkingQuery.endTime = 0;
-                (new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)).startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD ,1500);
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra(MainActivity.LICENSE_PLATE, licensePlate);
-                resultIntent.putExtra(MainActivity.DIRECTORY_LICENSE_PLATE, directoryLicensePlate);
-                MainActivity.this.setResult(RESULT_OK, resultIntent);
-                clearData();
-                MainActivity.this.finish();
-            }
-        });
+        if(!doExit.get()) {
+            doExit.set(true);
+            deleteRemovedLicenses();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ParkingQuery.endTime = 0;
+                    (new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME)).startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 1500);
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra(MainActivity.LICENSE_PLATE, licensePlate);
+                    resultIntent.putExtra(MainActivity.DIRECTORY_LICENSE_PLATE, directoryLicensePlate);
+                    MainActivity.this.setResult(RESULT_OK, resultIntent);
+                    clearData();
+                    MainActivity.this.finish();
+                }
+            });
+        }
     }
 
     private Vector<Plate> bestLicensePlatesDisplay() {
@@ -362,12 +380,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                         mPlatesRecyclerView.setAdapter(null);
                         plates.removeAllElements();
                         plates.addAll(tempPlates);
-                        try {
-                            for (Plate plate : plates)
-                                if (plate.count <= UCApp.countVerification)
-                                    plates.remove(plate);
+                        if(!UCApp.doNotQuery) {
+                            Log.i(TAG, "notifyExceptionPlates1:" + plates.size());
+                            try {
+                                for (Plate plate : plates) {
+                                    Log.i(TAG, "notifyExceptionPlates2:" + plate.license + ":" + plate.originalLicense);
+                                    if (plate.count <= UCApp.countVerification)
+                                        plates.remove(plate);
+                                }
+                            } catch (Exception e) {
+                            }
+                            Log.i(TAG, "notifyExceptionPlates3:"+plates.size());
                         }
-                        catch (Exception e) {}
                         mPlatesRecyclerView.setAdapter(mPlatesAdapter);
                     }
                     try {mPlatesAdapter.notifyDataSetChanged();} catch (Exception e) {} catch (Error e) {}
@@ -387,6 +411,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+
+        if(testing)
+            readFiles();
 
         topLicens_licensePlate = "";
         topLicens_directoryLicensePlate = "";
@@ -523,6 +550,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         UCApp.user = savedInstanceState.getInt("user");
         UCApp.location = savedInstanceState.getShort("location");
         UCApp.breakMode = savedInstanceState.getBoolean("breakMode");
+        UCApp.doNotQuery = savedInstanceState.getBoolean("doNotQuery");
         UCApp.motorcycleToo = savedInstanceState.getBoolean("motorcycleToo");
         testing = savedInstanceState.getBoolean("testing");
         ParkingQuery.endTime = savedInstanceState.getLong("endTime");
@@ -542,6 +570,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         savedInstanceState.putInt("user", UCApp.user);
         savedInstanceState.putShort("location", UCApp.location);
         savedInstanceState.putBoolean("breakMode", UCApp.breakMode);
+        savedInstanceState.putBoolean("doNotQuery", UCApp.doNotQuery);
         savedInstanceState.putBoolean("motorcycleToo", UCApp.motorcycleToo);
         savedInstanceState.putBoolean("testing", testing);
         savedInstanceState.putLong("endTime", ParkingQuery.endTime);
@@ -563,6 +592,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.user = 10;
             UCApp.streetNumber = "1";
             UCApp.breakMode = false;
+            UCApp.doNotQuery = true;
             UCApp.motorcycleToo = true;
             UCApp.highAccuracy = false;
             UCApp.timeout = 20;
@@ -579,16 +609,19 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.streetNumber = extraBundle.getString("StreetNumber");
             UCApp.breakMode = extraBundle.getBoolean("BreakMode");
             UCApp.timeout = extraBundle.getInt("timeout");
+            UCApp.doNotQuery = extraBundle.getBoolean("DoNotQuery");
             try {UCApp.motorcycleToo = extraBundle.getBoolean("SupportMotorcycle",true);} catch (Exception e) {}
             try {UCApp.highAccuracy = extraBundle.getBoolean("HighAccuracy",false);} catch (Exception e) {}
             try {UCApp.countVerification = extraBundle.getInt("CountVerification",2);} catch (Exception e) {}
         }
         saveConfigFile();
         plates = new Vector<>();
-        new Thread() { public void run() {
-            try { Thread.sleep(5000);} catch (InterruptedException ie) {}
-            parkingQuery.run();
-        }}.start();
+        if(!UCApp.doNotQuery) {
+            new Thread() { public void run() {
+                try {Thread.sleep(5000); } catch (InterruptedException ie) { }
+                parkingQuery.run();
+            }}.start();
+        }
     }
 
     protected synchronized void runInBackground(final Runnable r) {
@@ -949,6 +982,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 }
             }
         }
+//      Log.i(TAG, "processTextRecognitionResult:"+selectLicensePlate);
         if (selectLicensePlate.length() >= 7 && selectLicensePlate.length() <= 8 && selectLicensePlate.charAt(0) != '0') {
 //          if (mService != null && mService.getLocation() != null && !matchAllButOne(selectLicensePlate)) {
             if (mService != null) {
@@ -1055,6 +1089,9 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                     }
                 }
             }
+        }
+        if(UCApp.doNotQuery) {
+            notifyExceptionPlates();
         }
     }
 
@@ -1265,12 +1302,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 count += p.count;
         }
         if(count > UCApp.countVerification) {
-            (new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME)).startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD ,1000);
+            if((new Date()).getTime() > lastToneGenerator) {
+                lastToneGenerator = (new Date()).getTime()+2000;
+                (new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME)).startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 1000);
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         nextCarLayout.setVisibility(View.VISIBLE);
+                        if(UCApp.doNotQuery)
+                            gotoUrbanControl(plate.originalLicense, "");
                     } catch (Exception e) {
                     } catch (Error e) {
                     }
@@ -1467,6 +1509,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             outputStream.writeShort(UCApp.location);
             outputStream.writeBoolean(UCApp.breakMode);
             outputStream.writeBoolean(UCApp.motorcycleToo);
+            outputStream.writeBoolean(UCApp.doNotQuery);
             byte[] b = baos.toByteArray();
             dataOutputStream.write(b, 0, b.length);
             dataOutputStream.flush();
@@ -1502,6 +1545,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             UCApp.location = inputStream.readShort();
             UCApp.breakMode = inputStream.readBoolean();
             UCApp.motorcycleToo = inputStream.readBoolean();
+            UCApp.doNotQuery = inputStream.readBoolean();
             Log.e(TAG,"readConfigFile 2");
         }
         catch (Exception e) {

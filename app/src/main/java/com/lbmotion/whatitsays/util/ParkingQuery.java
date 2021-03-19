@@ -137,7 +137,7 @@ public class ParkingQuery extends Thread {
 	public LicenseQueryCompleted 		  licenseQueryCompleted;
 
 	public ParkingQuery(LicenseQueryCompleted licenseQueryCompleted) {
-		endTime = (new Date()).getTime()+20*60*1000  * 20;//^^^^
+		endTime = (new Date()).getTime()+20*60*1000 * 20;//^^^^
 		this.licenseQueryCompleted = licenseQueryCompleted;
 	}
 
@@ -148,28 +148,35 @@ public class ParkingQuery extends Thread {
 			try { Thread.sleep(250);} catch (InterruptedException ie) {}
 			Vector<PictureInformation>  pictureInformations = getCarInformationId();
 			if (pictureInformations == null) {
-//				Log.i(TAG+"X","pictureInformations == null");
+				Log.i(TAG+"X","pictureInformations == null");
 				break;
 			}
-			try { Thread.sleep(250);} catch (InterruptedException ie) {}
-			if(pictureInformations.size() == 0) {
-				try { Thread.sleep(500);} catch (InterruptedException ie) {}
-				continue;
+			if(!UCApp.doNotQuery) {
+				try { Thread.sleep(250);} catch (InterruptedException ie) {}
+				if(pictureInformations.size() == 0) {
+					try { Thread.sleep(500);} catch (InterruptedException ie) {}
+					continue;
+				}
 			}
-//			Log.i(TAG+"X","WORKING"+licensePlates);
+			Log.i(TAG+"X","WORKING"+licensePlates);
 			try {
 				for (PictureInformation pictureInformation : pictureInformations) {
 					if(!licensePlates.containsKey(pictureInformation.carInformationId)) {
-//						Log.i(TAG+"X","CONTINUE 1"+licensePlates+":"+pictureInformation.carInformationId);
+						Log.i(TAG+"X","CONTINUE 1"+licensePlates+":"+pictureInformation.carInformationId);
 						continue;
 					}
 					pageCarCommandLeft = pageCarCommandRight = pageCarActiveMenu = MenuTypes.beginning;
 					UCApp.checkLincense = null;
 					TicketInformation ti = new TicketInformation();
 					ti.CarInformationId = licensePlates.get(pictureInformation.carInformationId);
-					if(resultLicensePlates.containsKey(ti.CarInformationId)) {
+					if(UCApp.doNotQuery) {
+						licenseQueryCompleted.notifyQueryCompletion(ti.CarInformationId, pictureInformation.carInformationId, 1);
+						Log.i(TAG+"X","CONTINUE 2"+licensePlates+":"+pictureInformation.carInformationId);
+						continue;
+					}
+					else if(resultLicensePlates.containsKey(ti.CarInformationId)) {
 						licenseQueryCompleted.notifyQueryCompletion(ti.CarInformationId, pictureInformation.carInformationId, resultLicensePlates.get(ti.CarInformationId).intValue());
-//						Log.i(TAG+"X","CONTINUE 2"+licensePlates+":"+pictureInformation.carInformationId);
+						Log.i(TAG+"X","CONTINUE 2"+licensePlates+":"+pictureInformation.carInformationId);
 						continue;
 					}
 					ti.streetCode = UCApp.streetCode;
@@ -178,14 +185,15 @@ public class ParkingQuery extends Thread {
 					ti.longitude = pictureInformation.longitude;
 					if(UCApp.streetNumber == null)
 						MainActivity.readConfigFile();
-                    if (Base.communicationViaMiddleware) {
-						UCApp.checkLincense = (LisenceNumber.doCheck(ti.CarInformationId,"NO")).checkLincense;
-					} else {
-						UCApp.checkLincense = (LisenceNumberHTTP.doLisenceNumberHTTP(ti.CarInformationId,"NO")).checkLincense;
+					if(!UCApp.doNotQuery) {
+						if (Base.communicationViaMiddleware) {
+							UCApp.checkLincense = (LisenceNumber.doCheck(ti.CarInformationId, "NO")).checkLincense;
+						} else {
+							UCApp.checkLincense = (LisenceNumberHTTP.doLisenceNumberHTTP(ti.CarInformationId, "NO")).checkLincense;
+						}
 					}
 					ti.checkLincenseTime = (new Date()).getTime();
 					if (UCApp.checkLincense != null) {
-/*
 						Log.i(TAG+"X","SugTavT"+UCApp.checkLincense.SugTavT);
 						Log.i(TAG+"X","AveraAct"+UCApp.checkLincense.AveraAct);
 						Log.i(TAG+"X","SugTav"+UCApp.checkLincense.SugTav);
@@ -197,7 +205,6 @@ public class ParkingQuery extends Thread {
 						Log.i(TAG+"X","PrintKod"+UCApp.checkLincense.PrintKod);
 						Log.i(TAG+"X","PrintMsg"+UCApp.checkLincense.PrintMsg);
 						Log.i(TAG+"X","SwCellParkingPaid"+UCApp.checkLincense.SwCellParkingPaid);
-*/
 						ti.handicap = UCApp.checkLincense.handicap;
 						ti.wanted = UCApp.checkLincense.handicap;
 						ti.doubleReporting = UCApp.checkLincense.doubleReporting;
@@ -231,20 +238,20 @@ public class ParkingQuery extends Thread {
 						final int no_report [] = {2, 5, 10, 11, 12, 13, 14, 15, 16, 17, 19, 25, 26, 27, 28, 50, 51, 52, 53, 54, 55, 56, 57, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
 												  76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 105, 106, 107, 108, 170, 171, 3};
 //						final int report [] = {4, 6, 7, 9, 20, 21, 22, 23, 24};
-//						Log.i(TAG+"X","case 0");
+						Log.i(TAG+"X","case 0");
 						if(pageCarCommandLeft != MenuTypes.doTryAgain && !contains(UCApp.checkLincense.keshelKod,re_query)) {
 							if (pageCarCommandLeft != MenuTypes.beginning || pageCarCommandRight != MenuTypes.beginning || pageCarActiveMenu != MenuTypes.beginning) {
 								ti.packachDecisionCode = 0;
-//								Log.i(TAG+"X","case 1");
+								Log.i(TAG+"X","case 1");
 							}
 							else {
 								if (contains(UCApp.checkLincense.keshelKod,no_report)) {
 									ti.packachDecisionCode = 0;
-//									Log.i(TAG + "X", "case 2");
+									Log.i(TAG + "X", "case 2");
 								}
 								else {
 									ti.packachDecisionCode = 1;
-//									Log.i(TAG + "X", "case 3");
+									Log.i(TAG + "X", "case 3");
 								}
 							}
 							UCApp.checkLincense.save(ti.CarInformationId, pictureInformation.carInformationId, ti.checkLincenseTime, ti.packachDecisionCode);
@@ -258,7 +265,7 @@ public class ParkingQuery extends Thread {
 				}
 			} catch (Exception e) {
 				Log.i(TAG,"Run error:"+e.getMessage());
-//				Log.i(TAG+"X","ERROR");
+				Log.i(TAG+"X","ERROR");
 			}
 		}
 	}

@@ -75,6 +75,7 @@ public class UCApp extends Application {
     public static boolean                   breakMode = false;
     public static boolean                   motorcycleToo = true;
     public static boolean                   highAccuracy = false;
+    public static boolean                   doNotQuery = false;
     public static int                       countVerification = 2;
 
     @Override
